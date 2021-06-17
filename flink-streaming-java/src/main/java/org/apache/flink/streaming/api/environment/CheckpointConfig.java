@@ -631,36 +631,61 @@ public class CheckpointConfig implements java.io.Serializable {
      * @param configuration a configuration to read the values from
      */
     public void configure(ReadableConfig configuration) {
+
+        //TODO: execution.checkpointing.mode = CheckpointingMode.EXACTLY.ONCE(默认)
         configuration
                 .getOptional(ExecutionCheckpointingOptions.CHECKPOINTING_MODE)
                 .ifPresent(this::setCheckpointingMode);
+
+        //TODO: execution.checkpointing.interval = 2min 5min
+        // 不宜过大: 过大每次CK时候数据太多,压力太大;同样从最近一次CK恢复时,要恢复的状态数据也会很大
+        // 不宜过小: 太频繁会影响数据流
         configuration
                 .getOptional(ExecutionCheckpointingOptions.CHECKPOINTING_INTERVAL)
                 .ifPresent(i -> this.setCheckpointInterval(i.toMillis()));
+
+        //TODO: execution.checkpointing.timeout = 5min,每次CK时的超时时间,超时就直接取消本次的CK
         configuration
                 .getOptional(ExecutionCheckpointingOptions.CHECKPOINTING_TIMEOUT)
                 .ifPresent(t -> this.setCheckpointTimeout(t.toMillis()));
+
+        //TODO: execution.checkpointing.max-concurrent-checkpoints = 1 同时运行的CK个数,不允许上一次的CK没做完,下一次的CK就开始了
+        // 一个Job在任何时候要么只有一个CK在执行,要么没有CK在执行.
         configuration
                 .getOptional(ExecutionCheckpointingOptions.MAX_CONCURRENT_CHECKPOINTS)
                 .ifPresent(this::setMaxConcurrentCheckpoints);
+
+        //TODO: execution.checkpointing.min-pause = ZERO(默认)  CK的最小间隔时间
         configuration
                 .getOptional(ExecutionCheckpointingOptions.MIN_PAUSE_BETWEEN_CHECKPOINTS)
                 .ifPresent(m -> this.setMinPauseBetweenCheckpoints(m.toMillis()));
+
+
         configuration
                 .getOptional(ExecutionCheckpointingOptions.PREFER_CHECKPOINT_FOR_RECOVERY)
                 .ifPresent(this::setPreferCheckpointForRecovery);
+
+
         configuration
                 .getOptional(ExecutionCheckpointingOptions.TOLERABLE_FAILURE_NUMBER)
                 .ifPresent(this::setTolerableCheckpointFailureNumber);
+
+
         configuration
                 .getOptional(ExecutionCheckpointingOptions.EXTERNALIZED_CHECKPOINT)
                 .ifPresent(this::enableExternalizedCheckpoints);
+
+
         configuration
                 .getOptional(ExecutionCheckpointingOptions.ENABLE_UNALIGNED)
                 .ifPresent(this::enableUnalignedCheckpoints);
+
+
         configuration
                 .getOptional(ExecutionCheckpointingOptions.ALIGNMENT_TIMEOUT)
                 .ifPresent(timeout -> setAlignmentTimeout(timeout.toMillis()));
+
+
         configuration
                 .getOptional(ExecutionCheckpointingOptions.FORCE_UNALIGNED)
                 .ifPresent(this::setForceUnalignedCheckpoints);

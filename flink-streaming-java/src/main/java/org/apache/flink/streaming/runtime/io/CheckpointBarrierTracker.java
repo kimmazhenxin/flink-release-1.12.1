@@ -122,7 +122,9 @@ public class CheckpointBarrierTracker extends CheckpointBarrierHandler {
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Received all barriers for checkpoint {}", barrierId);
                     }
+                    //TODO: 标识对齐结束
                     markAlignmentEnd();
+                    //TODO: 通知可以进行 checkpoint 了
                     notifyCheckpoint(receivedBarrier);
                 }
             }

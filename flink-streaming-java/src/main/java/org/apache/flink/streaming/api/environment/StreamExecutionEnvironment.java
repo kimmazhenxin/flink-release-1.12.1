@@ -240,6 +240,15 @@ public class StreamExecutionEnvironment {
         // Given this, it is safe to overwrite the execution config default values here because all
         // other ways assume
         // that the env is already instantiated so they will overwrite the value passed here.
+
+        /*************************************************
+         *TODO
+         * 注释:进行各种组件配置
+         * 其中最重要的两件事:
+         * 1. 初始化得到 StateBackend
+         * 2. 初始化 Checkpoint相关参数
+         *
+         */
         this.configure(this.configuration, this.userClassloader);
     }
 
@@ -794,6 +803,10 @@ public class StreamExecutionEnvironment {
         configuration
                 .getOptional(StreamPipelineOptions.TIME_CHARACTERISTIC)
                 .ifPresent(this::setStreamTimeCharacteristic);
+
+        /**
+         * TODO: 加载得到 StateBackend
+         */
         Optional.ofNullable(loadStateBackend(configuration, classLoader))
                 .ifPresent(this::setStateBackend);
         configuration
@@ -833,6 +846,14 @@ public class StreamExecutionEnvironment {
                 .getOptional(PipelineOptions.NAME)
                 .ifPresent(jobName -> this.getConfiguration().set(PipelineOptions.NAME, jobName));
         config.configure(configuration, classLoader);
+
+        /**************************************
+         * TODO:
+         *  注释: checkpoint 相关参数的解析和配置
+         *  1. 从 configuration 对象中,解析各种跟 checkpoint有关的参数放置在 checkpointCfg对象
+         *  2. 将来解析各种算子,构造 StreamGraph 的时候,这个 checkpointCfg对象会传递给 StreamGraph
+         *  3. 由 StreamGraph去构造 JobGraph的时候,会继续传递该参数
+         */
         checkpointCfg.configure(configuration);
     }
 
@@ -1970,6 +1991,10 @@ public class StreamExecutionEnvironment {
 
         final RuntimeExecutionMode executionMode = configuration.get(ExecutionOptions.RUNTIME_MODE);
 
+        /**************************
+         * TODO
+         *  注释: 构建一个 StreamGraph生成器: StreamGraphGenerator
+         */
         return new StreamGraphGenerator(transformations, config, checkpointCfg, getConfiguration())
                 .setRuntimeExecutionMode(executionMode)
                 .setStateBackend(defaultStateBackend)
@@ -2048,6 +2073,7 @@ public class StreamExecutionEnvironment {
      */
     public static StreamExecutionEnvironment getExecutionEnvironment(Configuration configuration) {
         return Utils.resolveFactory(threadLocalContextEnvironmentFactory, contextEnvironmentFactory)
+                // TODO: 构建 StreamExecutionEnvironment
                 .map(factory -> factory.createExecutionEnvironment(configuration))
                 .orElseGet(() -> StreamExecutionEnvironment.createLocalEnvironment(configuration));
     }

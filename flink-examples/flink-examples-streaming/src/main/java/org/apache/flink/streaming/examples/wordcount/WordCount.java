@@ -54,6 +54,18 @@ public class WordCount {
         // Checking input parameters
         final MultipleParameterTool params = MultipleParameterTool.fromArgs(args);
 
+        /*************************************************
+         * TODO
+         *  注释： 第一步： 构建　StreamExecutionEnvironment
+         *  -
+         *  这行代码会返回一个可用的执行环境。执行环境是整个flink程序执行的上下文，记录了相关配置（如并行度等），
+         *  并提供了一系列方法，如读取输入流的方法，以及真正开始运行整个代码 的execute方法等。
+         *  -
+         *  1、初始化得到 StateBackend
+         *  2、从 env.getConfig() 解析得到 所有 checkpoint 有关的各种配置
+         *  -
+         *  另外补充一点：这个对象的内部，有一个成员变量： List transformations;
+         */
         // set up the execution environment
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
@@ -66,6 +78,11 @@ public class WordCount {
             // union all the inputs from text files
             for (String input : params.getMultiParameterRequired("input")) {
                 if (text == null) {
+                    /*************************************************
+                     * TODO
+                     *  注释： 第二步： 通过 env 读取数据得到 数据抽象： DataStream
+                     *  注意内部：Function ==> StreamOperator ==> Transformation
+                     */
                     text = env.readTextFile(input);
                 } else {
                     text = text.union(env.readTextFile(input));

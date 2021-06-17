@@ -253,11 +253,30 @@ public class StreamGraphGenerator {
         this.savepointRestoreSettings = savepointRestoreSettings;
     }
 
+    /********************************************
+     * TODO
+     *  注释:
+     *  1. 应用程序指定 Checkpoint的相关参数
+     *  2. 通过解析从 Configuration中存入 checkpointConfig对象,它是 env的成员变量
+     *  3. env 解析应用程序代码的时候,生成 StreamGraph 把 checkpointConfig设置到 StreamGraphGenerator中
+     *  4. 在真正生成 StreamGraph的时候,把 checkpointConfig设置成它的成员变量了。
+     */
+
     public StreamGraph generate() {
+
+        /******************************************
+         * TODO
+         *  注释: 构建一个 StreamGraph
+         *  这里注意第二个参数: checkpointConfig对象,它是 Checkpoint相关的参数,被设置到 StreamGraph中
+         */
         streamGraph = new StreamGraph(executionConfig, checkpointConfig, savepointRestoreSettings);
+
         shouldExecuteInBatchMode = shouldExecuteInBatchMode(runtimeExecutionMode);
+
+        //TODO: 设置 StateBackend和 Checkpoint
         configureStreamGraph(streamGraph);
 
+        //TODO: 初始化一个容器来存储已经转换过的 Transformation
         alreadyTransformed = new HashMap<>();
 
         for (Transformation<?> transformation : transformations) {
