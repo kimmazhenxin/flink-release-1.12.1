@@ -128,7 +128,7 @@ import java.util.UUID;
 public class DataStream<T> {
 
     protected final StreamExecutionEnvironment environment;
-
+    /** transformation是当前DataStream对应的上一次的转换操作，换句话讲，就是通过transformation生成当前的DataStream。*/
     protected final Transformation<T> transformation;
 
     /**

@@ -42,7 +42,7 @@ import static java.util.Objects.requireNonNull;
  * RuntimeContext}.
  */
 public class DefaultKeyedStateStore implements KeyedStateStore {
-
+    // 用于存储KeyedState的状态管理后端，默认为HeapKeyedStateBackend。如果配置RocksDB作为状态存储后端，则此处为RocksDBKeyedStateBackend。
     protected final KeyedStateBackend<?> keyedStateBackend;
     protected final ExecutionConfig executionConfig;
 

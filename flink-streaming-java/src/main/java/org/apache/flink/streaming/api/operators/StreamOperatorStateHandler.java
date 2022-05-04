@@ -71,7 +71,10 @@ public class StreamOperatorStateHandler {
     @Nullable private final CheckpointableKeyedStateBackend<?> keyedStateBackend;
 
     private final CloseableRegistry closeableRegistry;
+    // 主要提供KeyedState的状态存储服务，实际上是对KeyedStateBackend进行封装并提供了不同类型的KeyedState获取方法，
+    // 例如通过getReducingState(ReducingStateDescriptor stateProperties)方法获取ReducingState。
     @Nullable private final DefaultKeyedStateStore keyedStateStore;
+    // 和keyedStateBackend相似，主要提供OperatorState对应的状态后端存储，默认OperatorStateBackend只有DefaultOperatorStateBackend实现。
     private final OperatorStateBackend operatorStateBackend;
     private final StreamOperatorStateContext context;
 

@@ -200,6 +200,7 @@ public interface SourceFunction<T> extends Function, Serializable {
         void collect(T element);
 
         /**
+         * 支持直接收集数据元素以及EventTime时间戳。
          * Emits one element from the source, and attaches the given timestamp. This method is
          * relevant for programs using {@link TimeCharacteristic#EventTime}, where the sources
          * assign timestamps themselves, rather than relying on a {@link TimestampAssigner} on the
@@ -255,6 +256,7 @@ public interface SourceFunction<T> extends Function, Serializable {
         void markAsTemporarilyIdle();
 
         /**
+         * 用于获取检查点锁（Checkpoint Lock），例如使用KafkaConsumer读取数据时，可以使用检查点锁，确保记录发出的原子性和偏移状态更新。
          * Returns the checkpoint lock. Please refer to the class-level comment in {@link
          * SourceFunction} for details about how to write a consistent checkpointed source.
          *

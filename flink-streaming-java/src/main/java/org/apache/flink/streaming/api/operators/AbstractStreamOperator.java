@@ -128,16 +128,17 @@ public abstract class AbstractStreamOperator<OUT>
      * <p>This is for elements from the second input.
      */
     private transient KeySelector<?, ?> stateKeySelector2;
-
+    // 状态相关的设置,包括状态后端、状态存储等,分为KeyState和OperatorState
     private transient StreamOperatorStateHandler stateHandler;
-
+    // Flink内部时间服务,和ProcessingTimeService类似,但是支持事件时间
     private transient InternalTimeServiceManager<?> timeServiceManager;
 
     // --------------- Metrics ---------------------------
 
     /** Metric group for the operator. */
+    // 用于记录当前算子层面的监控指标，包括numRecordsIn、numRecordsOut、numRecordsInRate、numRecordsOutRate等。
     protected transient OperatorMetricGroup metrics;
-
+    // 用于采集和汇报当前Operator的延时状况
     protected transient LatencyStats latencyStats;
 
     // ---------------- time handler ------------------
@@ -148,8 +149,11 @@ public abstract class AbstractStreamOperator<OUT>
 
     // We keep track of watermarks from both inputs, the combined input is the minimum
     // Once the minimum advances we emit a new watermark for downstream operators
+    // 在双输入类型的算子中，如果基于事件时间处理乱序事件，会在AbstractStreamOperator中合并输入的Watermark，选择最小的Watermark作为合并后的指标，并存储在combinedWatermark变量中。
     private long combinedWatermark = Long.MIN_VALUE;
+    // 二元输入算子中input1对应的Watermark大小
     private long input1Watermark = Long.MIN_VALUE;
+    // 二元输入算子中input2对应的Watermark大小
     private long input2Watermark = Long.MIN_VALUE;
 
     // ------------------------------------------------------------------------
@@ -562,6 +566,12 @@ public abstract class AbstractStreamOperator<OUT>
     // ------------------------------------------------------------------------
 
     // ------- One input stream
+
+    /**
+     * 用于处理在SourceOperator中产生的LatencyMarker信息。在当前Operator中会计算事件和LatencyMarker之间的差值，用于评估当前算子的延时程度。
+     * @param latencyMarker
+     * @throws Exception
+     */
     public void processLatencyMarker(LatencyMarker latencyMarker) throws Exception {
         reportOrForwardLatencyMarker(latencyMarker);
     }
@@ -621,6 +631,11 @@ public abstract class AbstractStreamOperator<OUT>
                 name, keyedStateBackend.getKeySerializer(), namespaceSerializer, triggerable);
     }
 
+    /**
+     * 用于处理接入的Watermark时间戳信息，并用最新的Watermark更新当前算子内部的时钟
+     * @param mark
+     * @throws Exception
+     */
     public void processWatermark(Watermark mark) throws Exception {
         if (timeServiceManager != null) {
             timeServiceManager.advanceWatermark(mark);
@@ -651,6 +666,10 @@ public abstract class AbstractStreamOperator<OUT>
         return config.getOperatorID();
     }
 
+    /**
+     * 提供子类获取InternalTimerService的方法，以实现不同类型的Timer注册操作。
+     * @return
+     */
     protected Optional<InternalTimeServiceManager<?>> getTimeServiceManager() {
         return Optional.ofNullable(timeServiceManager);
     }

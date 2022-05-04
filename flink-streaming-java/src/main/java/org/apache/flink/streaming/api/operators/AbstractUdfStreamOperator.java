@@ -80,6 +80,7 @@ public abstract class AbstractUdfStreamOperator<OUT, F extends Function>
             StreamConfig config,
             Output<StreamRecord<OUT>> output) {
         super.setup(containingTask, config, output);
+        // 重要: userFunction能够获取RuntimeContext变量，然后实现获取状态数据等操作。
         FunctionUtils.setFunctionRuntimeContext(userFunction, getRuntimeContext());
     }
 
